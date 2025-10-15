@@ -1,0 +1,29 @@
+# Visual Studio and VS Code
+.vs/
+*.VC.db
+*.suo
+*.user
+*.vcxproj.user
+
+# Build artifacts
+build/
+out/
+[Bb]in/
+[Oo]bj/
+
+# CMake generated files
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+install_manifest.txt
+
+# Common compiled outputs
+*.exe
+*.dll
+*.so
+*.a
+*.lib
+
+# Other
+*.log
