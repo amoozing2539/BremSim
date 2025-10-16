@@ -41,5 +41,9 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
 	G4LogicalVolume* logicDetector = new G4LogicalVolume(solidDetector, detector_mat, "logicalDetector");
 	new G4PVPlacement(0, detector_pos, logicDetecotr, "physDetector", logicWorld, false, 0, true);
 
+	// make detector volume a sensitive detector
+	auto aSensitiveDetector = new SensitiveDetector("SensitiveDetector");
+	logicDetector->SetSensitiveDetector(aSensitiveDetector);
+
 	return physWorld;
 }
