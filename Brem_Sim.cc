@@ -35,7 +35,7 @@ int main(int argc, char** argv)
 	{
 		G4String command = "/control/execute ";
 		G4String fileName = argv[1];
-		UIManager->ApplyCommand(command + fileName);
+		UImanager->ApplyCommand(command + fileName);
 	}
 	else //interactive mode
 	{
