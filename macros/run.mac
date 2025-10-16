@@ -1,0 +1,6 @@
+# Use UI commands to change particle energy, etc.
+/gun/particle e-
+/gun/energy 5 Mev
+
+# Run one event
+/run/beamOn 1

@@ -1,0 +1,5 @@
+#initialize kernel 
+/run/initialize
+
+#set up a simple viewer
+/control/execute vis.mac
