@@ -9,7 +9,7 @@
 SensitiveDetector::SensitiveDetector(G4String name) : G4VSensitiveDetector(name) {}
 SensitiveDetector::~SensitiveDetector() {}
 
-G4vool SensitiveDetector::ProcessHits(G4Step* aStep, G4TouchableHistory* RoHist)
+G4bool SensitiveDetector::ProcessHits(G4Step* aStep, G4TouchableHistory* RoHist)
 {
 	// Get the particle's track
 	auto track = aStep->GetTrack();
