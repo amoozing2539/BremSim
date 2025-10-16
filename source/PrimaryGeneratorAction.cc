@@ -1,3 +1,5 @@
+//Particle Gun
+
 #include "PrimaryGeneratorAction.hh"
 #include "G4ParticleGun.hh"
 #include "G4ParticleTable.hh"
