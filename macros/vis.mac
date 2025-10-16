@@ -1,0 +1,8 @@
+# vis driver
+/vis/open OGL
+
+# initialize geometry 
+/vis/drawVolume
+
+# set view angle
+/vis/viewer/set/viewpointThetaPhi 70 20

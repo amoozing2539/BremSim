@@ -26,7 +26,7 @@ G4vool SensitiveDetector::ProcessHits(G4Step* aStep, G4TouchableHistory* RoHist)
 	G4ThreeVector pos = aStep->GetPreStepPoint()->GetPosition();
 	G4ThreeVector momentumDir = aStep->GetPreStepPoint()->GetMomentumDirection();
 
-	// Print the data 
+	// Print the data to the console (just to see if it works for now)
 	G4cout << "Hit >>> Particle: " << particleName
 		<< ", Energy: " << G4BestUnit(energy, "Energy")
 		<< ", Position: " << G4BestUnit(pos, "Length")
