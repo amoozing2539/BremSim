@@ -34,5 +34,15 @@ void RunAction::BeginOfRunAction(const G4Run* run)
 
 	// open output file
 	G4String fileName = "output.csv";
-	analysisManager->OpenFile(filename);
+	analysisManager->OpenFile(fileName);
+}
+
+void RunAction::EndOfRunAction(const G4Run* run)
+{
+	// Get analysis manager
+	auto analysisManager = G4AnalysisManager::Instance();
+
+	// Write and close the file
+	analysisManager->Write();
+	analysisManager->CloseFile();
 }

@@ -6,7 +6,7 @@
 
 class G4Run;
 
-class Runaction : public G4UserRunAction
+class RunAction : public G4UserRunAction
 {
 public:
 	RunAction();

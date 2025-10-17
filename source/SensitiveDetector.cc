@@ -7,6 +7,7 @@
 #include "G4SystemOfUnits.hh"
 #include "G4UnitsTable.hh"
 #include "G4AnalysisManager.hh"
+#include "G4RunManager.hh"
 
 SensitiveDetector::SensitiveDetector(G4String name) : G4VSensitiveDetector(name) {}
 SensitiveDetector::~SensitiveDetector() {}
@@ -23,7 +24,7 @@ G4bool SensitiveDetector::ProcessHits(G4Step* aStep, G4TouchableHistory* RoHist)
 	}
 
 	// Get data from the step
-	G4int eventID = G4RunManager::GetRunManger()->GetCurrentEvent()->GetEventID();
+	G4int eventID = G4RunManager::GetRunManager()->GetCurrentEvent()->GetEventID();
 	G4int particleID = track->GetDefinition()->GetPDGEncoding();
 	G4double energy = aStep->GetPreStepPoint()->GetKineticEnergy() / keV;
 	G4ThreeVector pos = aStep->GetPreStepPoint()->GetPosition() / mm;
