@@ -7,7 +7,7 @@
 #include "G4PVPlacement.hh"
 #include "G4SDManager.hh"
 #include "G4SystemOfUnits.hh"
-#include "G4PhysicalVolume.hh"
+#include "G4VPhysicalVolume.hh"
 
 #include "SensitiveDetector.hh" 
 

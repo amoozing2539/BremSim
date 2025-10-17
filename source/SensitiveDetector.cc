@@ -5,6 +5,7 @@
 #include "G4Step.hh"
 #include "G4TouchableHistory.hh"
 #include "G4SystemOfUnits.hh"
+#include "G4UnitsTable.hh"
 
 SensitiveDetector::SensitiveDetector(G4String name) : G4VSensitiveDetector(name) {}
 SensitiveDetector::~SensitiveDetector() {}
@@ -28,10 +29,10 @@ G4bool SensitiveDetector::ProcessHits(G4Step* aStep, G4TouchableHistory* RoHist)
 
 	// Print the data to the console (just to see if it works for now)
 	G4cout << "Hit >>> Particle: " << particleName
-		<< ", Energy: " << G4BestUnit(energy, "Energy")
-		<< ", Position: " << G4BestUnit(pos, "Length")
-		<< ", Momentum Direction: " << momentumDir
-		<< G4endl;
+		   << ", Energy: " << G4BestUnit(energy, "Energy")
+		   << ", Position: " << G4BestUnit(pos, "Length")
+		   << ", Momentum Direction: " << momentumDir
+		   << G4endl;
 
 	return true;
 }
