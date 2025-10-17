@@ -6,3 +6,7 @@
 
 # set view angle
 /vis/viewer/set/viewpointThetaPhi 70 20
+
+# Draw particle trajectories and hits
+/vis/scene/add/trajectories
+/vis/scene/add/hits

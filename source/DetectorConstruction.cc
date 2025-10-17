@@ -29,7 +29,7 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
 	// Foil
 	G4double foil_thickness = 2.0 * mm;
 	G4double foil_xy = 10.0 * cm;
-	G4Box* solidFoil = new G4Box("Foil", 0.5 * foil_xy, .5 * foil_xy, .5 * foil_xy);
+	G4Box* solidFoil = new G4Box("Foil", 0.5 * foil_xy, .5 * foil_xy, .5 * foil_thickness); //foil that is ~2mm thick 
 	G4LogicalVolume* logicFoil = new G4LogicalVolume(solidFoil, foil_mat, "logicFoil");
 	new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logicFoil, "physFoil", logicWorld, false, 0, true);
 
