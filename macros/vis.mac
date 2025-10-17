@@ -10,3 +10,15 @@
 # Draw particle trajectories and hits
 /vis/scene/add/trajectories
 /vis/scene/add/hits
+
+# Make trajectories smooth and visible
+/vis/modeling/trajectories/create/default/setDrawStepPts true
+/vis/modeling/trajectories/create/default/setStepPtsSize 1
+
+# Assign colors to different particles
+/vis/modeling/trajectories/create/particle-colors # "by-particle" coloring scheme
+/vis/modeling/trajectories/particle-colors/set e- blue
+/vis/modeling/trajectories/particle-colors/set gamma green
+/vis/modeling/trajectories/particle-colors/set e+ red
+
+
