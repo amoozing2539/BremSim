@@ -27,7 +27,7 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
 	G4VPhysicalVolume* physWorld = new G4PVPlacement(0, G4ThreeVector(), logicWorld, "physWorld", 0, false, 0, true); //place world centered at (0,0,0)
 
 	// Foil
-	G4double foil_thickness = .01 * mm;
+	G4double foil_thickness = .05 * mm;
 	G4double foil_xy = 10.0 * cm;
 	G4Box* solidFoil = new G4Box("Foil", 0.5 * foil_xy, .5 * foil_xy, .5 * foil_thickness); //foil that is ~2mm thick 
 	G4LogicalVolume* logicFoil = new G4LogicalVolume(solidFoil, foil_mat, "logicFoil");
@@ -38,7 +38,7 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
 	G4double detector_xy = 30.0 * cm;
 	G4ThreeVector detector_pos = G4ThreeVector(0, 0, (0.5 * foil_thickness) + (0.5 * detector_thickness) + (1.0 * mm)); //as close to the foil as possible (1mm).
 	G4Box* solidDetector = new G4Box("Detector", 0.5 * detector_xy, 0.5 * detector_xy, 0.5 * detector_thickness);
-	G4LogicalVolume* logicDetector = new G4LogicalVolume(solidDetector, detector_mat, "logicalDetector");
+	G4LogicalVolume* logicDetector = new G4LogicalVolume(solidDetector, detector_mat, "logicDetector");
 	new G4PVPlacement(0, detector_pos, logicDetector, "physDetector", logicWorld, false, 0, true);
 
 	// make detector volume a sensitive detector
