@@ -15,7 +15,7 @@ PrimaryGeneratorAction::PrimaryGeneratorAction() : G4VUserPrimaryGeneratorAction
 	G4ParticleDefinition* particle = particleTable->FindParticle("e-"); // electron
 	fParticleGun->SetParticleDefinition(particle); // set the gun with electrons
 	fParticleGun->SetParticleMomentumDirection(G4ThreeVector(0., 0., 1.)); // shoot along the z-axis
-	fParticleGun->SetParticleEnergy(1.0 * MeV); // Default Energy of the beam
+	fParticleGun->SetParticleEnergy(5.0 * MeV); // Default Energy of the beam
 	fParticleGun->SetParticlePosition(G4ThreeVector(0., 0., -5.0 * cm)); // Start 5cm IN FRONT of the foil
 }
 
