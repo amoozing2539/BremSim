@@ -19,7 +19,7 @@ G4VPhysicalVolume* DetectorConstruction::Construct()
 	G4NistManager* nist = G4NistManager::Instance();
 	G4Material* world_mat = nist->FindOrBuildMaterial("G4_AIR");
 	G4Material* foil_mat = nist->FindOrBuildMaterial("G4_W"); //Tungsten target material
-	G4Material* detector_mat = nist->FindOrBuildMaterial("G4_AIR");
+	G4Material* detector_mat = nist->FindOrBuildMaterial("G4_Galactic");
 
 	// World
 	G4Box* solidWorld = new G4Box("World", 1.0 * m, 1.0 * m, 1.0 * m); 

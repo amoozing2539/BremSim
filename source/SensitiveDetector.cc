@@ -23,6 +23,9 @@ G4bool SensitiveDetector::ProcessHits(G4Step* aStep, G4TouchableHistory* RoHist)
 		return false;
 	}
 
+	// print that particle has hit detector (DEBUGGING TOOL)
+	G4cout << "----------- SD HIT ---------------------------- Particle: " << track->GetDefinition()->GetParticleName() << G4endl;
+
 	// Get data from the step
 	G4int eventID = G4RunManager::GetRunManager()->GetCurrentEvent()->GetEventID();
 	G4int particleID = track->GetDefinition()->GetPDGEncoding();
@@ -35,12 +38,12 @@ G4bool SensitiveDetector::ProcessHits(G4Step* aStep, G4TouchableHistory* RoHist)
 	auto analysisManager = G4AnalysisManager::Instance();
 	analysisManager->FillNtupleIColumn(0, eventID);
 	analysisManager->FillNtupleIColumn(1, particleID);
-	analysisManager->FillNtupleIColumn(2, energy);
-	analysisManager->FillNtupleIColumn(3, pos.x());
-	analysisManager->FillNtupleIColumn(4, pos.y());
-	analysisManager->FillNtupleIColumn(5, momentumDir.x());
-	analysisManager->FillNtupleIColumn(6, momentumDir.y());
-	analysisManager->FillNtupleIColumn(7, momentumDir.z());
+	analysisManager->FillNtupleDColumn(2, energy);
+	analysisManager->FillNtupleDColumn(3, pos.x());
+	analysisManager->FillNtupleDColumn(4, pos.y());
+	analysisManager->FillNtupleDColumn(5, momentumDir.x());
+	analysisManager->FillNtupleDColumn(6, momentumDir.y());
+	analysisManager->FillNtupleDColumn(7, momentumDir.z());
 	analysisManager->AddNtupleRow();
 
 	return true;
