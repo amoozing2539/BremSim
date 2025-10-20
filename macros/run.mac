@@ -3,4 +3,4 @@
 /gun/energy 5 MeV
 
 # Run one event
-/run/beamOn 1
+/run/beamOn 100
