@@ -24,6 +24,7 @@ install_manifest.txt
 *.so
 *.a
 *.lib
+*.csv
 
 # Other
 *.log
