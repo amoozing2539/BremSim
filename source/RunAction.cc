@@ -4,6 +4,7 @@
 #include "G4AnalysisManager.hh"
 #include "G4SystemOfUnits.hh"
 
+
 RunAction::RunAction() : G4UserRunAction()
 {
 	// Create a G4AnalysisManager instance
@@ -15,12 +16,12 @@ RunAction::RunAction() : G4UserRunAction()
 	analysisManager->CreateNtuple("BremHits", "Bremsstrahlung Hits");
 	analysisManager->CreateNtupleIColumn("EventID");				// Col 0: Event Number
 	analysisManager->CreateNtupleIColumn("ParticleID");				// Col 1: Particle type
-	analysisManager->CreateNtupleIColumn("Energy_keV");				// Col 2: Energy in keV
-	analysisManager->CreateNtupleIColumn("PosX_mm");				// Col 3: X position (mm)
-	analysisManager->CreateNtupleIColumn("PosY_mm");				// Col 4: Y position (mm)
-	analysisManager->CreateNtupleIColumn("MomDirX");				// Col 5: Momentum Direction X
-	analysisManager->CreateNtupleIColumn("MomDirY");				// Col 6: Momentum Direction Y
-	analysisManager->CreateNtupleIColumn("MomDirZ");				// Col 7: Momentum Direction Z
+	analysisManager->CreateNtupleDColumn("Energy_keV");				// Col 2: Energy in keV. Saving them as doubles bc our data will be doubles. 
+	analysisManager->CreateNtupleDColumn("PosX_mm");				// Col 3: X position (mm)
+	analysisManager->CreateNtupleDColumn("PosY_mm");				// Col 4: Y position (mm)
+	analysisManager->CreateNtupleDColumn("MomDirX");				// Col 5: Momentum Direction X
+	analysisManager->CreateNtupleDColumn("MomDirY");				// Col 6: Momentum Direction Y
+	analysisManager->CreateNtupleDColumn("MomDirZ");				// Col 7: Momentum Direction Z
 	analysisManager->FinishNtuple();
 }
 

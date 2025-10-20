@@ -30,6 +30,7 @@ G4bool SensitiveDetector::ProcessHits(G4Step* aStep, G4TouchableHistory* RoHist)
 	G4ThreeVector pos = aStep->GetPreStepPoint()->GetPosition() / mm;
 	G4ThreeVector momentumDir = aStep->GetPreStepPoint()->GetMomentumDirection();
 
+
 	// Get the analysis manager and fill the n-tuple
 	auto analysisManager = G4AnalysisManager::Instance();
 	analysisManager->FillNtupleIColumn(0, eventID);
