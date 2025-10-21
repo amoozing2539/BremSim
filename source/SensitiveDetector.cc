@@ -18,15 +18,18 @@ G4bool SensitiveDetector::ProcessHits(G4Step* aStep, G4TouchableHistory* RoHist)
 	auto track = aStep->GetTrack();
 
 	// only interested in particles just entering the detector volume 
-	if (aStep->GetPreStepPoint()->GetStepStatus() != fGeomBoundary)
-	{
-		return false;
-	}
+	// if (aStep->GetPreStepPoint()->GetStepStatus() != fGeomBoundary)
+	// {
+	// 	return false;
+	// }
+
+	G4StepPoint* preStepPoint = aStep->GetPreStepPoint();
 
 	// print that particle has hit detector (DEBUGGING TOOL)
-	G4cout << "----------- SD HIT ---------------------------- Particle: " << track->GetDefinition()->GetParticleName() << G4endl;
+	G4cout << "----------- SD HIT ---------------------------- Particle: " 
+		   << track->GetDefinition()->GetParticleName() << G4endl;
 
-	// Get data from the step
+	// Get data from the preStepPoint
 	G4int eventID = G4RunManager::GetRunManager()->GetCurrentEvent()->GetEventID();
 	G4int particleID = track->GetDefinition()->GetPDGEncoding();
 	G4double energy = aStep->GetPreStepPoint()->GetKineticEnergy() / keV;
@@ -45,6 +48,9 @@ G4bool SensitiveDetector::ProcessHits(G4Step* aStep, G4TouchableHistory* RoHist)
 	analysisManager->FillNtupleDColumn(6, momentumDir.y());
 	analysisManager->FillNtupleDColumn(7, momentumDir.z());
 	analysisManager->AddNtupleRow();
+
+	//kill the track after recording the hit to avoid multiple entries
+	track->SetTrackStatus(fStopAndKill);
 
 	return true;
 
