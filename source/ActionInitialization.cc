@@ -1,12 +1,26 @@
 #include "ActionInitialization.hh"
+
+#include "EventAction.hh"
 #include "PrimaryGeneratorAction.hh"
 #include "RunAction.hh"
+#include "SteppingAction.hh"
 
-ActionInitialization::ActionInitialization() : G4VUserActionInitialization() {}
-ActionInitialization::~ActionInitialization() {}
 
-void ActionInitialization::Build() const
+namespace BremSim
 {
-	SetUserAction(new PrimaryGeneratorAction); //Start the gun 
-	SetUserAction(new RunAction()); 
+	void ActionInitialization::Build() const{
+		
+		//Multithread
+
+		// set Geant4 Actions
+		SetUserAction(new PrimaryGeneratorAction);
+		SetUserAction(new Runaction());
+		SetUserAction(new SteppingAction());
+	};
+
+	void ActionInitialization::BuildForMaster() const{
+
+		//sequential
+		SetUserAction(newRunAction());
+	}
 }

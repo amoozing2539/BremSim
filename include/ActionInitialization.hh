@@ -1,13 +1,19 @@
-#ifndef ACTIONINITIALIZATION_HH
-#define ACTIONINITIALIZATION_HH
+#ifndef BremSim_ActionInitialization_H
+#define BremSim_ActionInitialization_H 1
 
 #include "G4VUserActionInitialization.hh"
 
-class ActionInitialization : public G4VUserActionInitialization
+namespace BremSim
 {
-public: 
-	ActionInitialization();
-	~ActionInitialization();
-	virtual void Build() const;
-};
+	class ActionInitialization: public G4VUserActionInitialization
+	{
+		public:
+			ActionInitialization() = default;
+			~ActionInitialization() override = default;
+
+			void Build() const override;
+			void BuildForMaster() const override;
+	};
+}
+
 #endif

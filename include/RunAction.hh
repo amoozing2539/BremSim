@@ -1,19 +1,31 @@
-#ifndef RUNACTION_HH
-#define RUNACTION_HH
+#ifndef BREMSIM_RUNACTION_HH
+#define BREMSIM_RUNACTION_HH
 
 #include "G4UserRunAction.hh"
 #include "globals.hh"
+#include "G4AnalysisManager"
 
-class G4Run;
+// time the run
+#include "G4Timer.hh"
 
-class RunAction : public G4UserRunAction
+namespace BremSim
 {
-public:
-	RunAction();
-	virtual ~RunAction();
 
-	virtual void BeginOfRunAction(const G4Run*);
-	virtual void EndOfRunAction(const G4Run*);
-};
+	class HitsCollection;
+	
+	class RunAction : public G4UserrunAction
+	{
+		public:
+			RunAction();
+			~RunAction();
 
+			void BegOfRunAction(const G4Run* aRun) override;
+			void EndOfRunAction(const G4Run* aRun) override;
+		
+		private:
+
+			G4timer fTimer;
+			void PrintTime();
+	};
+}
 #endif
