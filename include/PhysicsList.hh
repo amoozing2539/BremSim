@@ -1,12 +1,21 @@
-#ifndef PHYSICSLIST_HH
-#define PHYSICSLIST_HH
+#ifndef BREMSIM_PHYSICSLIST_H
+#define BREMSIM_PHYSICSLIST_H 1
 
 #include "G4VModularPhysicsList.hh"
 
-class PhysicsList : public G4VModularPhysicsList
+
+namespace BremSim
 {
-public:
-	PhysicsList();
-	~PhysicsList();
-};
+	class PhysicsList : public G4VModularPhysicsList
+	{
+		public:
+			PhysicsList();
+			virtual ~PhysicsList() override = default;
+
+			// mandatory methods to override
+			virtual void ConstructParticle() override;
+			virtual void ConstructProcess() override;
+			
+	};
+}
 #endif

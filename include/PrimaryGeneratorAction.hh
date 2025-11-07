@@ -1,20 +1,26 @@
 // Particle Gun
 
-#ifndef PRIMARYGENERATORACTION_HH
-#define PRIMARYGENERATORACTION_HH
+#ifndef PRIMARYGENERATORACTION_H
+#define PRIMARYGENERATORACTION_H 1
 
 #include "G4VUserPrimaryGeneratorAction.hh"
-class G4ParticleGun;
-class G4Event;
+#include "G4ThreeVector.hh"
+#include "globals.hh"
+#include "G4SystemOfUnits.hh"
+#include "G4ParticleGun.hh"
 
-class PrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction
+
+namespace BremSim
 {
-public:
-	PrimaryGeneratorAction();
-	~PrimaryGeneratorAction();
-	virtual void GeneratePrimaries(G4Event*);
+	class PrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction
+	{
+		public:
+			PrimaryGeneratorAction();
+			~PrimaryGeneratorAction();
 
-private:
-	G4ParticleGun* fParticleGun;
-};
+			virtual void GeneratePrimaries(G4Event*);
+
+			G4ParticleGun* fParticleGun;
+	};
+}
 #endif
