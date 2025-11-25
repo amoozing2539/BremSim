@@ -1,0 +1,9 @@
+# Initialize kernel
+/run/initialize
+
+# Use UI commands to change particle energy, etc.
+/gun/particle e-
+/gun/energy 5 MeV
+
+# Run one event
+/run/beamOn 1000000

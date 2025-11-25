@@ -1,49 +1,77 @@
 #include "RunAction.hh"
-#include "G4Run.hh"
-#include "G4RunManager.hh"
-#include "G4AnalysisManager.hh"
-#include "G4SystemOfUnits.hh"
+#include "G4ThreeVector.hh"
+#include "G4UnitsTable.hh"
 
 
-RunAction::RunAction() : G4UserRunAction()
+namespace BremSim
 {
-	// Create a G4AnalysisManager instance
-	auto analysisManager = G4AnalysisManager::Instance();
-	analysisManager->SetVerboseLevel(1);
-	analysisManager->SetNtupleMerging(true);
+	RunAction::RunAction()
+	{
+		// set up analysis nTuples and output files
 
-	// Create an n-tuple (like a table) to store our data
-	analysisManager->CreateNtuple("BremHits", "Bremsstrahlung Hits");
-	analysisManager->CreateNtupleIColumn("EventID");				// Col 0: Event Number
-	analysisManager->CreateNtupleIColumn("ParticleID");				// Col 1: Particle type
-	analysisManager->CreateNtupleDColumn("Energy_keV");				// Col 2: Energy in keV. Saving them as doubles bc our data will be doubles. 
-	analysisManager->CreateNtupleDColumn("PosX_mm");				// Col 3: X position (mm)
-	analysisManager->CreateNtupleDColumn("PosY_mm");				// Col 4: Y position (mm)
-	analysisManager->CreateNtupleDColumn("MomDirX");				// Col 5: Momentum Direction X
-	analysisManager->CreateNtupleDColumn("MomDirY");				// Col 6: Momentum Direction Y
-	analysisManager->CreateNtupleDColumn("MomDirZ");				// Col 7: Momentum Direction Z
-	analysisManager->FinishNtuple();
-}
+		auto analysisManager = G4AnalysisManager::Instance();
 
-RunAction::~RunAction() {}
+		// set default settings
+		analysisManager->SetDefaultFileType("root");
+		analysisManager->SetNtupleMerging(true);
+		analysisManager->SetVerboseLevel(1);
+		analysisManager->SetFileName("output");
 
-// write analysisManager into .csv file
-void RunAction::BeginOfRunAction(const G4Run* run)
-{
-	// Get analysis manager
-	auto analysisManager = G4AnalysisManager::Instance();
+		// create nTuple to store the absolute energies
+		const G4int ntupleID1 = analysisManager->CreateNtuple("Absolute Energies", "Gamma Energies");
+		analysisManager->CreateNtupleDColumn(ntupleID1, "AbsEnergy");
+		analysisManager->CreateNtupleIColumn(ntupleID1, "ParticleID"); // 0 for gamma, 1 for electron
+		analysisManager->FinishNtuple(ntupleID1);
 
-	// open output file
-	G4String fileName = "output.csv";
-	analysisManager->OpenFile(fileName);
-}
+		// create nTuple for the relative energies
+		const G4int ntupleId2 = analysisManager->CreateNtuple("Relative Energies", "Gamma Energies");
+		analysisManager->CreateNtupleDColumn(ntupleId2, "RelEnergy");
+		analysisManager->FinishNtuple(ntupleId2);
+	}
 
-void RunAction::EndOfRunAction(const G4Run* run)
-{
-	// Get analysis manager
-	auto analysisManager = G4AnalysisManager::Instance();
 
-	// Write and close the file
-	analysisManager->Write();
-	analysisManager->CloseFile();
+	RunAction::~RunAction()
+	{
+
+	}
+
+
+	void RunAction::BeginOfRunAction(const G4Run* run)
+	{
+		// start time 
+		fTimer.Start();
+
+		auto analysisManager = G4AnalysisManager::Instance();
+
+		// open the file at the start of the run
+		analysisManager->OpenFile();
+	}
+
+
+	void RunAction::EndOfRunAction(const G4Run* run)
+	{
+		auto analysisManager = G4AnalysisManager::Instance();
+
+		// write to output file 
+		analysisManager->Write();
+		analysisManager->CloseFile();
+
+		// end time
+		fTimer.Stop();
+
+		// print out the time it took 
+		if(IsMaster()){ PrintTime(); }
+	}
+
+
+	void RunAction::PrintTime()
+	{
+		auto time = fTimer.GetRealElapsed();
+
+		G4cout 
+			<< "Elapsed time: "
+			<< time
+			<< " Seconds."
+			<< G4endl;
+	}
 }

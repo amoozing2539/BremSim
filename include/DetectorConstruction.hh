@@ -1,15 +1,25 @@
-#ifndef DETECTORCONSTRUCTION_HH
-#define DETECTORCONSTRUCTION_HH
+#ifndef BREMSIM_DETECTORCONSTRUCTION_H
+#define BREMSIM_DETECTORCONSTRUCTION_H 1
+
 
 #include "G4VUserDetectorConstruction.hh"
-class G4VPhysicalVolume;
 
-class DetectorConstruction : public G4VUserDetectorConstruction
+
+namespace BremSim
 {
-public:
-	DetectorConstruction();
-	~DetectorConstruction();
+	class DetectorConstruction : public G4VUserDetectorConstruction
+	{
+	public:
+		DetectorConstruction() = default;
+		~DetectorConstruction() override = default;
 
-	virtual G4VPhysicalVolume* Construct();
-};
-#endif
+		G4VPhysicalVolume* Construct() override;
+
+		G4LogicalVolume* GetBremsVolume() const { return fBremsVolume; };
+
+	private:
+		G4LogicalVolume* fBremsVolume = nullptr;
+	};
+}
+
+#endif // BREMSIM_DETECTORCONSTRUCTION_H
