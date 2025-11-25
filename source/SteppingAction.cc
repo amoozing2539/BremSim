@@ -59,19 +59,23 @@ namespace BremSim
 			const G4Track* track = (*secondaries)[i];
 			G4String particleName = track->GetParticleDefinition()->GetParticleName();
 
-			// only get photons to analysis Manager
-			if (particleName == "gamma")
+			// get photons and electrons to analysis Manager
+			if (particleName == "gamma" || particleName == "e-")
 			{
 				G4double energy = track->GetKineticEnergy();
+				G4int particleID = (particleName == "e-") ? 1 : 0;
 
 				// total energy
 				analysisManager->FillNtupleDColumn(absNTupleID, 0, energy);
+				analysisManager->FillNtupleIColumn(absNTupleID, 1, particleID);
 				analysisManager->AddNtupleRow(absNTupleID);
 
 				// relative energy to incident electron
-				G4double relEnergy = energy/electronEnergy;
-				analysisManager->FillNtupleDColumn(relNTupleID, 0, relEnergy);
-				analysisManager->AddNtupleRow(relNTupleID);
+				if (particleName == "gamma") {
+					G4double relEnergy = energy/electronEnergy;
+					analysisManager->FillNtupleDColumn(relNTupleID, 0, relEnergy);
+					analysisManager->AddNtupleRow(relNTupleID);
+				}
 			}
 		}
 		

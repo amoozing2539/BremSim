@@ -20,6 +20,7 @@ namespace BremSim
 		// create nTuple to store the absolute energies
 		const G4int ntupleID1 = analysisManager->CreateNtuple("Absolute Energies", "Gamma Energies");
 		analysisManager->CreateNtupleDColumn(ntupleID1, "AbsEnergy");
+		analysisManager->CreateNtupleIColumn(ntupleID1, "ParticleID"); // 0 for gamma, 1 for electron
 		analysisManager->FinishNtuple(ntupleID1);
 
 		// create nTuple for the relative energies

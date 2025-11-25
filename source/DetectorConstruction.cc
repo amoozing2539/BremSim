@@ -40,7 +40,7 @@ namespace BremSim
 		new G4PVPlacement(0, detector_pos, logicDetector, "physDetector", logicWorld, false, 0, true);
 	
 		// set the brems volume
-		fBremsVolume = logicDetector;
+		fBremsVolume = logicFoil;
 	
 		return physWorld; // always return the world
 	}
