@@ -18,17 +18,9 @@ namespace BremSim
 
 	void SteppingAction::UserSteppingAction(const G4Step* step)
 	{
-		// we want to check if photons are emitted from the Bremsstrahlung emission
-		// 1. relative enregy based ont he electron that created it. 
-		// 2. total energy spectra of all photons generated
-		// Note: if there are other detectors that possible generate secondary photons, they will be recorded a well.
-
-		// first check if we're not in the fBremsVolume
-		if(!fBremsVolume)
-		{
-			const auto detConstruction = static_cast<const DetectorConstruction*>(G4RunManager::GetRunManager()->GetUserDetectorConstruction());
-			fBremsVolume = detConstruction->GetBremsVolume();
-		}
+		// Always update the BremsVolume as it might change between runs (re-initialization)
+		const auto detConstruction = static_cast<const DetectorConstruction*>(G4RunManager::GetRunManager()->GetUserDetectorConstruction());
+		fBremsVolume = detConstruction->GetBremsVolume();
 
 		G4LogicalVolume* currentVolume =
 			step->GetPreStepPoint()->GetTouchableHandle()

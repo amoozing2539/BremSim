@@ -5,7 +5,7 @@
 #include "G4UIExecutive.hh"
 #include "G4RunManagerFactory.hh" 
 #include "G4VisExecutive.hh"
-#include"G4SteppingVerbose.hh"
+#include "G4SteppingVerbose.hh"
 
 //our files in the include folder
 #include "DetectorConstruction.hh"
@@ -29,6 +29,15 @@ int main(int argc, char** argv)
 
 	// create run manager
 	auto* runManager = G4RunManagerFactory::CreateRunManager(G4RunManagerType::Default);
+
+	// Check and set MultiThreading
+	if (runManager->GetRunManagerType() == G4RunManager::MT) {
+		G4int nThreads = G4Threading::G4GetNumberOfCores();
+		runManager->SetNumberOfThreads(nThreads);
+		G4cout << "### RunManager type is MT. Setting number of threads to: " << nThreads << G4endl;
+	} else {
+		G4cout << "### RunManager type is Serial." << G4endl;
+	}
 
 	//Set mandatory user intialization classes
 	runManager->SetUserInitialization(new DetectorConstruction());
