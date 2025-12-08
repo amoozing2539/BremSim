@@ -39,13 +39,21 @@ namespace BremSim
 		G4double radius = .5*mm;
 		double x,y;
 
-		// square sampling 
+		// rejection sampling loop to pick a random (x,y) point within a circle of radius r
+		// rejection sampling simulates a beam spot size. 
 		do{
-			x = G4UniformRand() * (2.0*radius)-radius;
+			// sets x and y to be between -radius and radius
+			x = G4UniformRand() * (2.0*radius)-radius; //G4UniformRand() returns a random number between 0 and 1.
 			y = G4UniformRand() * (2.0*radius)-radius;
 			
-		} while (x*x + y*y > radius*radius); //while area stays within the circle area (normalized)
+		} while (x*x + y*y > radius*radius); //Keep sampling if the point lies outside the circle (does not satisfy our criteria)
 
+		//break down of the rejection sampling algorithm above is as follows:
+		// 1. Select x from a unifrom distribution between [-R, R]
+		// 2. Select y from a unifrom distribution between [-R, R]
+		// 3. Accept (x,y)_i if: x^2+y^2<=R^2, else: reject (x,y)_i and sample again
+
+		//set get position and fire particle into the world 
 		fParticleGun->SetParticlePosition(G4ThreeVector(x,y,-5 * cm));
 		fParticleGun->GeneratePrimaryVertex(event); // satisfy "generate primaries" here
 	}
