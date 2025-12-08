@@ -30,3 +30,5 @@ install_manifest.txt
 *.log
 *.png
 *.root
+*.pkl
+*.npy

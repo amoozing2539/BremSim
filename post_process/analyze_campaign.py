@@ -17,8 +17,6 @@ def parse_filename(filename):
     Example: output_E_1.0MeV_T_50um.root
     """
     basename = os.path.basename(filename)
-    # Regex to capture Energy and Thickness
-    # Matches: output_E_1.0MeV_T_50um.root -> 1.0, 50um
     match = re.search(r"output_E_([\d\.]+)MeV_T_(.+)\.root", basename)
     if match:
         energy = float(match.group(1))
@@ -44,6 +42,33 @@ def load_data(file_path):
         logging.error(f"Failed to read {file_path}: {e}")
         return None
 
+def freedman_diaconis(data):
+    """
+    Calculate optimal bin width using Freedman-Diaconis rule.
+    Bin Width = 2 * IQR * n^(-1/3)
+    """
+    if len(data) < 2:
+        return 0.1
+    # Check for zero range
+    if data.max() == data.min():
+        return 0.1
+        
+    q75, q25 = np.percentile(data, [75 ,25])
+    iqr = q75 - q25
+    n = len(data)
+    
+    if iqr == 0:
+        # Fallback if IQR is 0 (e.g. all data is same or very concentrated)
+        # Use std dev based rule or simple fixed count
+        std = np.std(data)
+        if std == 0:
+            return 0.1
+        bin_width = 3.5 * std * (n ** (-1/3))
+        return bin_width
+        
+    bin_width = 2 * iqr * (n ** (-1/3))
+    return bin_width
+
 def analyze_campaign(data_dir="."):
     """
     Scans for ROOT files, loads data, and generates summary plots.
@@ -58,20 +83,7 @@ def analyze_campaign(data_dir="."):
 
     logging.info(f"Found {len(files)} files. Processing...")
 
-    # Store summary stats for Yield Plot
-    # Structure: {thickness: {energy: photon_count}}
-    yield_data = {}
-    
-    # Store full data for specific plots
-    # We can't store ALL data in memory if it's 10M particles * 250 files, 
-    # but we can store histograms or subsets.
-    # For now, let's just store the summary yield and plot specific examples on the fly.
-    
-    # Define "Interesting" configurations to plot detailed spectra for
-    # Example: Plot spectra for all thicknesses at Max Energy
-    # Example: Plot spectra for all energies at a specific Thickness
-    
-    # First pass: Collect metadata and calculate yields
+    # First pass: Collect metadata
     file_metadata = []
     for f in files:
         energy, thickness = parse_filename(f)
@@ -92,7 +104,13 @@ def analyze_campaign(data_dir="."):
         return
 
     unique_energies = sorted(meta_df["energy"].unique())
-    unique_thicknesses = sorted(meta_df["thickness"].unique(), key=lambda x: (float(re.findall(r"[\d\.]+", x)[0]) if re.findall(r"[\d\.]+", x) else 0))
+    # Sort thicknesses roughly by value
+    def parse_thick(s):
+        val = float(re.findall(r"[\d\.]+", s)[0])
+        if "mm" in s: val *= 1000
+        return val
+        
+    unique_thicknesses = sorted(meta_df["thickness"].unique(), key=parse_thick)
 
     logging.info(f"Energies: {unique_energies}")
     logging.info(f"Thicknesses: {unique_thicknesses}")
@@ -126,39 +144,56 @@ def analyze_campaign(data_dir="."):
 
 
     # --- PLOT 2: Spectra Comparison (Fixed Energy, Varying Thickness) ---
-    # Pick the highest energy available to see the most features
+    # Pick the highest energy available
     target_energy = unique_energies[-1] 
     logging.info(f"Plotting spectra for fixed Energy: {target_energy} MeV")
     
-    plt.figure(figsize=(10, 6))
+    plt.figure(figsize=(12, 7))
     subset = meta_df[meta_df["energy"] == target_energy]
     
     for _, row in subset.iterrows():
         df = load_data(row["path"])
         if df is not None:
+            # Photons (ID 0)
             photons = df[df["ParticleID"] == 0]["AbsEnergy"]
-            # Use fixed bins for comparison
-            plt.hist(photons, bins=100, range=(0, target_energy), histtype='step', linewidth=2, label=row["thickness"], density=True)
+            # Electrons (ID 1)
+            electrons = df[df["ParticleID"] == 1]["AbsEnergy"]
+            
+            # Label
+            lbl = row["thickness"]
+            
+            # Plot Photons
+            if len(photons) > 0:
+                bw_p = freedman_diaconis(photons)
+                bins_p = int((photons.max() - photons.min()) / bw_p)
+                bins_p = max(10, min(bins_p, 200)) # Safety Limits
+                plt.hist(photons, bins=bins_p, histtype='step', linewidth=2, label=f"{lbl} $\gamma$", density=True)
+            
+            # Plot Electrons
+            if len(electrons) > 0:
+                bw_e = freedman_diaconis(electrons)
+                bins_e = int((electrons.max() - electrons.min()) / bw_e)
+                bins_e = max(10, min(bins_e, 200)) # Safety Limits
+                plt.hist(electrons, bins=bins_e, histtype='step', linewidth=2, linestyle='--', label=f"{lbl} $e^-$", density=True)
 
-    plt.title(f"Photon Spectra at {target_energy} MeV Beam Energy")
-    plt.xlabel("Photon Energy (MeV)")
+    plt.title(f"Particle Spectra at {target_energy} MeV Beam Energy")
+    plt.xlabel("Energy (MeV)")
     plt.ylabel("Normalized Count")
     plt.yscale('log')
-    plt.legend(title="Foil Thickness")
+    plt.legend(title="Foil Thickness / Particle")
     plt.grid(True, alpha=0.3)
     plt.savefig(f"spectra_E_{target_energy}MeV_comparison.png")
     logging.info(f"Saved spectra_E_{target_energy}MeV_comparison.png")
 
 
     # --- PLOT 3: Spectra Evolution (Fixed Thickness, Varying Energy) ---
-    # Pick a middle thickness
     target_thickness = unique_thicknesses[len(unique_thicknesses)//2]
     logging.info(f"Plotting spectra for fixed Thickness: {target_thickness}")
     
-    plt.figure(figsize=(10, 6))
+    plt.figure(figsize=(12, 7))
     subset = meta_df[meta_df["thickness"] == target_thickness].sort_values("energy")
     
-    # Plot a few selected energies to avoid clutter (e.g., 5 steps)
+    # Plot a few selected energies
     step = max(1, len(subset) // 5)
     selected_rows = subset.iloc[::step]
     
@@ -166,17 +201,30 @@ def analyze_campaign(data_dir="."):
         df = load_data(row["path"])
         if df is not None:
             photons = df[df["ParticleID"] == 0]["AbsEnergy"]
-            plt.hist(photons, bins=100, histtype='step', linewidth=2, label=f"{row['energy']} MeV")
+            electrons = df[df["ParticleID"] == 1]["AbsEnergy"]
+            
+            lbl = f"{row['energy']} MeV"
+            
+            if len(photons) > 0:
+                bw_p = freedman_diaconis(photons)
+                bins_p = int((photons.max() - photons.min()) / bw_p)
+                bins_p = max(10, min(bins_p, 200)) # Safety Limits
+                plt.hist(photons, bins=bins_p, histtype='step', linewidth=2, label=f"{lbl} $\gamma$")
+                
+            if len(electrons) > 0:
+                bw_e = freedman_diaconis(electrons)
+                bins_e = int((electrons.max() - electrons.min()) / bw_e)
+                bins_e = max(10, min(bins_e, 200)) # Safety Limits
+                plt.hist(electrons, bins=bins_e, histtype='step', linewidth=2, linestyle='--', label=f"{lbl} $e^-$")
 
-    plt.title(f"Photon Spectra Evolution for {target_thickness} Foil")
-    plt.xlabel("Photon Energy (MeV)")
+    plt.title(f"Particle Spectra Evolution for {target_thickness} Foil")
+    plt.xlabel("Energy (MeV)")
     plt.ylabel("Count")
     plt.yscale('log')
-    plt.legend(title="Beam Energy")
+    plt.legend(title="Beam Energy / Particle")
     plt.grid(True, alpha=0.3)
     plt.savefig(f"spectra_T_{target_thickness}_evolution.png")
     logging.info(f"Saved spectra_T_{target_thickness}_evolution.png")
 
 if __name__ == "__main__":
-    # Run in the current directory where the root files are
     analyze_campaign(".")
