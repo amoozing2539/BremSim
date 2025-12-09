@@ -160,4 +160,14 @@ def combine_data(data_dir="."):
     print(f"Shape: {df_final.shape}")
 
 if __name__ == "__main__":
-    combine_data(".")
+    # Determine the directory relative to the script location
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    # Go up one level to project root, then into build/Release
+    data_directory = os.path.join(os.path.dirname(script_dir), "build", "Release")
+    
+    if os.path.exists(data_directory):
+        print(f"Searching for data in: {data_directory}")
+        combine_data(data_directory)
+    else:
+        print(f"Warning: Directory {data_directory} not found. Searching in current directory.")
+        combine_data(".")

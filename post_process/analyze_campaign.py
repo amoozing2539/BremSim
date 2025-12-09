@@ -144,46 +144,48 @@ def analyze_campaign(data_dir="."):
 
 
     # --- PLOT 2: Spectra Comparison (Fixed Energy, Varying Thickness) ---
-    # Pick the highest energy available
-    target_energy = unique_energies[-1] 
-    logging.info(f"Plotting spectra for fixed Energy: {target_energy} MeV")
-    
-    plt.figure(figsize=(12, 7))
-    subset = meta_df[meta_df["energy"] == target_energy]
-    
-    for _, row in subset.iterrows():
-        df = load_data(row["path"])
-        if df is not None:
-            # Photons (ID 0)
-            photons = df[df["ParticleID"] == 0]["AbsEnergy"]
-            # Electrons (ID 1)
-            electrons = df[df["ParticleID"] == 1]["AbsEnergy"]
-            
-            # Label
-            lbl = row["thickness"]
-            
-            # Plot Photons
-            if len(photons) > 0:
-                bw_p = freedman_diaconis(photons)
-                bins_p = int((photons.max() - photons.min()) / bw_p)
-                bins_p = max(10, min(bins_p, 200)) # Safety Limits
-                plt.hist(photons, bins=bins_p, histtype='step', linewidth=2, label=f"{lbl} $\gamma$", density=True)
-            
-            # Plot Electrons
-            if len(electrons) > 0:
-                bw_e = freedman_diaconis(electrons)
-                bins_e = int((electrons.max() - electrons.min()) / bw_e)
-                bins_e = max(10, min(bins_e, 200)) # Safety Limits
-                plt.hist(electrons, bins=bins_e, histtype='step', linewidth=2, linestyle='--', label=f"{lbl} $e^-$", density=True)
+    logging.info(f"Generating spectra comparison plots for all {len(unique_energies)} energies...")
 
-    plt.title(f"Particle Spectra at {target_energy} MeV Beam Energy")
-    plt.xlabel("Energy (MeV)")
-    plt.ylabel("Normalized Count")
-    plt.yscale('log')
-    plt.legend(title="Foil Thickness / Particle")
-    plt.grid(True, alpha=0.3)
-    plt.savefig(f"spectra_E_{target_energy}MeV_comparison.png")
-    logging.info(f"Saved spectra_E_{target_energy}MeV_comparison.png")
+    for target_energy in unique_energies:
+        logging.info(f"Plotting spectra for fixed Energy: {target_energy} MeV")
+        
+        plt.figure(figsize=(12, 7))
+        subset = meta_df[meta_df["energy"] == target_energy]
+        
+        for _, row in subset.iterrows():
+            df = load_data(row["path"])
+            if df is not None:
+                # Photons (ID 0)
+                photons = df[df["ParticleID"] == 0]["AbsEnergy"]
+                # Electrons (ID 1)
+                electrons = df[df["ParticleID"] == 1]["AbsEnergy"]
+                
+                # Label
+                lbl = row["thickness"]
+                
+                # Plot Photons
+                if len(photons) > 0:
+                    bw_p = freedman_diaconis(photons)
+                    bins_p = int((photons.max() - photons.min()) / bw_p)
+                    bins_p = max(10, min(bins_p, 200)) # Safety Limits
+                    plt.hist(photons, bins=bins_p, histtype='step', linewidth=2, label=f"{lbl} $\gamma$", density=True)
+                
+                # Plot Electrons
+                if len(electrons) > 0:
+                    bw_e = freedman_diaconis(electrons)
+                    bins_e = int((electrons.max() - electrons.min()) / bw_e)
+                    bins_e = max(10, min(bins_e, 200)) # Safety Limits
+                    plt.hist(electrons, bins=bins_e, histtype='step', linewidth=2, linestyle='--', label=f"{lbl} $e^-$", density=True)
+
+        plt.title(f"Particle Spectra at {target_energy} MeV Beam Energy")
+        plt.xlabel("Energy (MeV)")
+        plt.ylabel("Normalized Count")
+        plt.yscale('log')
+        plt.legend(title="Foil Thickness / Particle")
+        plt.grid(True, alpha=0.3)
+        plt.savefig(f"spectra_E_{target_energy}MeV_comparison.png")
+        plt.close() # Close figure to free memory
+        logging.info(f"Saved spectra_E_{target_energy}MeV_comparison.png")
 
 
     # --- PLOT 3: Spectra Evolution (Fixed Thickness, Varying Energy) ---
@@ -227,4 +229,14 @@ def analyze_campaign(data_dir="."):
     logging.info(f"Saved spectra_T_{target_thickness}_evolution.png")
 
 if __name__ == "__main__":
-    analyze_campaign(".")
+    # Determine the directory relative to the script location
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    # Go up one level to project root, then into build/Release
+    data_directory = os.path.join(os.path.dirname(script_dir), "build", "Release")
+    
+    if os.path.exists(data_directory):
+        print(f"Searching for data in: {data_directory}")
+        analyze_campaign(data_directory)
+    else:
+        print(f"Warning: Directory {data_directory} not found. Searching in current directory.")
+        analyze_campaign(".")
