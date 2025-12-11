@@ -84,8 +84,16 @@ def prepare_pointwise_data(data, bin_centers):
     X = np.vstack((X_photons, X_electrons))
     y = np.concatenate((y_photons, y_electrons))
     
-    print(f"Total Data Points Generated: {len(y)}")
-    return X, y
+    total_points = len(y)
+    print(f"Total Data Points Generated: {total_points}")
+    
+    # Save the processed pointwise data
+    output_pkl = os.path.join(os.path.dirname(__file__), "training_data_pointwise.pkl")
+    print(f"Saving processing training data to {output_pkl}...")
+    with open(output_pkl, 'wb') as f:
+        pickle.dump({'X': X, 'y': y}, f)
+        
+    return X, y, total_points
 
 class BremSpecNet(nn.Module):
     def __init__(self):
@@ -114,7 +122,7 @@ class BremSpecNet(nn.Module):
 
 def train_model(pickle_path, bin_edges_path):
     data, bin_centers = load_data(pickle_path, bin_edges_path)
-    X, y = prepare_pointwise_data(data, bin_centers)
+    X, y, num_points = prepare_pointwise_data(data, bin_centers)
     
     # Filter out zero-value bins to reduce noise? 
     # Optional: For now, we keep them so the model learns where flux is zero.
