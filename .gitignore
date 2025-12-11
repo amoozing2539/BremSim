@@ -32,3 +32,5 @@ install_manifest.txt
 *.root
 *.pkl
 *.npy
+*.pth
+*.ipynb
