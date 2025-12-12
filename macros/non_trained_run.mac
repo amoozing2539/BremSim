@@ -14,12 +14,12 @@
 
 # Energy 0.2 MeV
 /gun/energy 0.2 MeV
-/analysis/setFileName output_E_0.2MeV_T_225um.root
+/analysis/setFileName output_E_0.2MeV_T_25um.root
 /run/beamOn 1000000
 
 # Energy 0.3 MeV
 /gun/energy 0.3 MeV
-/analysis/setFileName output_E_0.3MeV_T_225um.root
+/analysis/setFileName output_E_0.3MeV_T_25um.root
 /run/beamOn 1000000
 
 # Energy 0.4 MeV
