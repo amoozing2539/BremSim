@@ -1,9 +1,12 @@
 # Initialize kernel
 /run/initialize
+# Configuration: Thickness 5 um
+/BremSim/det/setFoilThickness 5 um
+/run/reinitializeGeometry
 
 # Use UI commands to change particle energy, etc.
 /gun/particle e-
 /gun/energy 5 MeV
-
+/analysis/setFileName output_E_0.1MeV_T_5um.root
 # Run one event
 /run/beamOn 1000000

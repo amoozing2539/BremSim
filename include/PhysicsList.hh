@@ -15,6 +15,7 @@ namespace BremSim
 			// mandatory methods to override
 			virtual void ConstructParticle() override;
 			virtual void ConstructProcess() override;
+			virtual void SetCuts() override;
 			
 	};
 }

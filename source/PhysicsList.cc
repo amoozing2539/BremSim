@@ -13,6 +13,8 @@
 #include "G4EmStandardPhysicsWVI.hh"
 #include "G4EmStandardPhysicsSS.hh"
 #include "G4EmStandardPhysicsGS.hh"
+#include "G4SystemOfUnits.hh"
+#include "G4ProductionCuts.hh"
 
 
 namespace BremSim
@@ -32,4 +34,16 @@ namespace BremSim
 	{
 		G4VModularPhysicsList::ConstructProcess();
 	}
+
+	void PhysicsList::SetCuts()
+    {
+        // Default production thresholds for the world volume
+        //SetCutsWithDefault();
+        G4VUserPhysicsList::SetCuts();
+        // Set production cut values for gamma, e-, e+, proton
+        SetCutValue(1.0 * um, "gamma");
+        SetCutValue(1.0 * um, "e-");
+        SetCutValue(1.0 * um, "e+");
+    }
+
 }
