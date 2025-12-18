@@ -52,10 +52,15 @@ namespace BremSim
 			G4String particleName = track->GetParticleDefinition()->GetParticleName();
 
 			// get photons and electrons to analysis Manager
-			if (particleName == "gamma" || particleName == "e-")
+			if (particleName == "gamma" || particleName == "e-" || particleName == "e+" ) //we saw some electrons at 2-2.3 Mev for high energy, we predict some electron-positron pairs
 			{
 				G4double energy = track->GetKineticEnergy();
-				G4int particleID = (particleName == "e-") ? 1 : 0;
+				// G4int particleID = (particleName == "e-") ? 1 : 0;
+				// we saw some electrons at 2-2.3 MeV for high incident beam energy and thin foil, we predict some electron-positron pairs
+				G4int particleID = 0;
+				if (particleName == "gamma") { particleID = 0; }
+				else if (particleName == "e-") { particleID = 1; }
+				else if (particleName == "e+") { particleID = 2; }
 
 				// total energy
 				analysisManager->FillNtupleDColumn(absNTupleID, 0, energy);

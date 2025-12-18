@@ -146,13 +146,20 @@ def analyze_campaign(data_dir="."):
     # --- PLOT 2: Spectra Comparison (Fixed Energy, Varying Thickness) ---
     logging.info(f"Generating spectra comparison plots for all {len(unique_energies)} energies...")
 
+    # Get a color cycle (e.g., from tab10 or similar)
+    prop_cycle = plt.rcParams['axes.prop_cycle']
+    colors = prop_cycle.by_key()['color']
+
     for target_energy in unique_energies:
         logging.info(f"Plotting spectra for fixed Energy: {target_energy} MeV")
         
         plt.figure(figsize=(12, 7))
         subset = meta_df[meta_df["energy"] == target_energy]
         
-        for _, row in subset.iterrows():
+        # Sort subset by thickness parser to ensure consistent legend order
+        subset = subset.sort_values("thickness", key=lambda x: x.map(parse_thick))
+
+        for i, (_, row) in enumerate(subset.iterrows()):
             df = load_data(row["path"])
             if df is not None:
                 # Photons (ID 0)
@@ -163,19 +170,22 @@ def analyze_campaign(data_dir="."):
                 # Label
                 lbl = row["thickness"]
                 
+                # Assign distinct color for this thickness
+                color = colors[i % len(colors)]
+
                 # Plot Photons
                 if len(photons) > 0:
                     bw_p = freedman_diaconis(photons)
                     bins_p = int((photons.max() - photons.min()) / bw_p)
                     bins_p = max(10, min(bins_p, 200)) # Safety Limits
-                    plt.hist(photons, bins=bins_p, histtype='step', linewidth=2, label=f"{lbl} $\gamma$", density=True)
+                    plt.hist(photons, bins=bins_p, histtype='step', linewidth=2, color=color, linestyle='-', label=f"{lbl} $\gamma$", density=True)
                 
                 # Plot Electrons
                 if len(electrons) > 0:
                     bw_e = freedman_diaconis(electrons)
                     bins_e = int((electrons.max() - electrons.min()) / bw_e)
                     bins_e = max(10, min(bins_e, 200)) # Safety Limits
-                    plt.hist(electrons, bins=bins_e, histtype='step', linewidth=2, linestyle='--', label=f"{lbl} $e^-$", density=True)
+                    plt.hist(electrons, bins=bins_e, histtype='step', linewidth=2, color=color, linestyle='--', label=f"{lbl} $e^-$", density=True)
 
         plt.title(f"Particle Spectra at {target_energy} MeV Beam Energy")
         plt.xlabel("Energy (MeV)")
@@ -189,44 +199,57 @@ def analyze_campaign(data_dir="."):
 
 
     # --- PLOT 3: Spectra Evolution (Fixed Thickness, Varying Energy) ---
-    target_thickness = unique_thicknesses[len(unique_thicknesses)//2]
-    logging.info(f"Plotting spectra for fixed Thickness: {target_thickness}")
+    logging.info(f"Generating spectra evolution plots for all thicknesses...")
     
-    plt.figure(figsize=(12, 7))
-    subset = meta_df[meta_df["thickness"] == target_thickness].sort_values("energy")
+    # Use standard colors
+    prop_cycle = plt.rcParams['axes.prop_cycle']
+    colors = prop_cycle.by_key()['color']
     
-    # Plot a few selected energies
-    step = max(1, len(subset) // 5)
-    selected_rows = subset.iloc[::step]
-    
-    for _, row in selected_rows.iterrows():
-        df = load_data(row["path"])
-        if df is not None:
-            photons = df[df["ParticleID"] == 0]["AbsEnergy"]
-            electrons = df[df["ParticleID"] == 1]["AbsEnergy"]
-            
-            lbl = f"{row['energy']} MeV"
-            
-            if len(photons) > 0:
-                bw_p = freedman_diaconis(photons)
-                bins_p = int((photons.max() - photons.min()) / bw_p)
-                bins_p = max(10, min(bins_p, 200)) # Safety Limits
-                plt.hist(photons, bins=bins_p, histtype='step', linewidth=2, label=f"{lbl} $\gamma$")
+    for target_thickness in unique_thicknesses:
+        logging.info(f"Plotting spectra for fixed Thickness: {target_thickness}")
+        
+        plt.figure(figsize=(12, 7))
+        subset = meta_df[meta_df["thickness"] == target_thickness].sort_values("energy")
+        
+        # Plot a few selected energies (or all if user wants, but let's stick to sample for clarity unless small)
+        if len(subset) > 10:
+             step = max(1, len(subset) // 5)
+             selected_rows = subset.iloc[::step]
+        else:
+             selected_rows = subset
+        
+        for i, (_, row) in enumerate(selected_rows.iterrows()):
+            df = load_data(row["path"])
+            if df is not None:
+                photons = df[df["ParticleID"] == 0]["AbsEnergy"]
+                electrons = df[df["ParticleID"] == 1]["AbsEnergy"]
                 
-            if len(electrons) > 0:
-                bw_e = freedman_diaconis(electrons)
-                bins_e = int((electrons.max() - electrons.min()) / bw_e)
-                bins_e = max(10, min(bins_e, 200)) # Safety Limits
-                plt.hist(electrons, bins=bins_e, histtype='step', linewidth=2, linestyle='--', label=f"{lbl} $e^-$")
+                lbl = f"{row['energy']} MeV"
+                
+                # Assign distinct color for this Energy
+                color = colors[i % len(colors)]
+                
+                if len(photons) > 0:
+                    bw_p = freedman_diaconis(photons)
+                    bins_p = int((photons.max() - photons.min()) / bw_p)
+                    bins_p = max(10, min(bins_p, 200)) # Safety Limits
+                    plt.hist(photons, bins=bins_p, histtype='step', linewidth=2, color=color, linestyle='-', label=f"{lbl} $\gamma$")
+                    
+                if len(electrons) > 0:
+                    bw_e = freedman_diaconis(electrons)
+                    bins_e = int((electrons.max() - electrons.min()) / bw_e)
+                    bins_e = max(10, min(bins_e, 200)) # Safety Limits
+                    plt.hist(electrons, bins=bins_e, histtype='step', linewidth=2, color=color, linestyle='--', label=f"{lbl} $e^-$")
 
-    plt.title(f"Particle Spectra Evolution for {target_thickness} Foil")
-    plt.xlabel("Energy (MeV)")
-    plt.ylabel("Count")
-    plt.yscale('log')
-    plt.legend(title="Beam Energy / Particle")
-    plt.grid(True, alpha=0.3)
-    plt.savefig(f"spectra_T_{target_thickness}_evolution.png")
-    logging.info(f"Saved spectra_T_{target_thickness}_evolution.png")
+        plt.title(f"Particle Spectra Evolution for {target_thickness} Foil")
+        plt.xlabel("Energy (MeV)")
+        plt.ylabel("Count")
+        plt.yscale('log')
+        plt.legend(title="Beam Energy / Particle")
+        plt.grid(True, alpha=0.3)
+        plt.savefig(f"spectra_T_{target_thickness}_evolution.png")
+        plt.close() # Close figure to free memory
+        logging.info(f"Saved spectra_T_{target_thickness}_evolution.png")
 
 if __name__ == "__main__":
     # Determine the directory relative to the script location
