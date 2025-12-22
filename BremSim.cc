@@ -6,6 +6,7 @@
 #include "G4RunManagerFactory.hh" 
 #include "G4VisExecutive.hh"
 #include "G4SteppingVerbose.hh"
+#include "G4Threading.hh"
 
 //our files in the include folder
 #include "DetectorConstruction.hh"
@@ -28,10 +29,10 @@ int main(int argc, char** argv)
 	}
 
 	// create run manager
-	auto* runManager = G4RunManagerFactory::CreateRunManager(G4RunManagerType::Default);
+	auto* runManager = G4RunManagerFactory::CreateRunManager(G4RunManagerType::MT);
 
 	// Check and set MultiThreading
-	if (runManager->GetRunManagerType() == G4RunManager::MT) {
+	if (runManager->GetRunManagerType() == G4RunManager::masterRM) {
 		G4int nThreads = G4Threading::G4GetNumberOfCores();
 		runManager->SetNumberOfThreads(nThreads);
 		G4cout << "### RunManager type is MT. Setting number of threads to: " << nThreads << G4endl;
